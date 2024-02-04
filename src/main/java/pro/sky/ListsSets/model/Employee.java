@@ -1,4 +1,4 @@
-package pro.sky.ListsSets;
+package pro.sky.ListsSets.model;
 
 import java.util.Objects;
 
@@ -32,7 +32,7 @@ public class Employee {
     public int hashCode() {
         return Objects.hash(firstName,lastName);
     }
-
+@Override
     public boolean equals(Object object) {
         if (this==object) return true;
         if ((object==null) ||getClass()!=object.getClass()) return false;
