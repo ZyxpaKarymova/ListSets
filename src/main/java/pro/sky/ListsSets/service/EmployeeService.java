@@ -7,68 +7,48 @@ import pro.sky.ListsSets.exceptions.EmployeeNotFoundException;
 import pro.sky.ListsSets.exceptions.EmployeeStorageFullException;
 import pro.sky.ListsSets.model.Employee;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Service
 public class EmployeeService {
     private static final int AMOUNT = 5;
-    private final Employee[] employees = new Employee[AMOUNT];
-    private int addedEmloyees = 0;
+    private final List<Employee> employees = new ArrayList();
+
 
 
     public Employee addEmployee(@RequestParam() String firstName, @RequestParam() String lastName) {
-        if (addedEmloyees >= AMOUNT) {throw new EmployeeStorageFullException();}
+        if (employees.size() >= AMOUNT) {
+            throw new EmployeeStorageFullException();
+        }
         Employee employee = new Employee(firstName, lastName);
-        if (findEmployee(employee) >= 0) {
+        if (employees.contains(employee)) {
             throw new EmployeeAlreadyAddedException();
         }
-        employees[addedEmloyees] = employee;
-        addedEmloyees++;
+        employees.add(employee);
         return employee;
     }
 
-
     public Employee removeEmployee(String firstName, String lastName) {
         Employee target = new Employee(firstName, lastName);
-        int targetIndex = findEmployee(target);
-        if (targetIndex < 0) {
+        if (!employees.remove(target)) {
             throw new EmployeeNotFoundException();
         }
-        /*for (int i = 0; i < addedEmloyees; i++) {
-            if (employees[i] != null && (employees[i].equals(target))) {
-                targetIndex = i;
-                break;
-            }
-        }*/
-        if (targetIndex < 0) {
-            throw new EmployeeNotFoundException();
-        }
-        employees[targetIndex] = null;
-        if (targetIndex != employees.length - 1)
-            System.arraycopy(employees, targetIndex + 1, employees, targetIndex, employees.length - targetIndex - 1);
-        addedEmloyees--;
+
         return target;
     }
-
 
     public Employee findEmployee(String firstName, String lastName) {
         Employee target = new Employee(firstName, lastName);
-        int targetIndex = findEmployee(target);
+        int targetIndex = employees.indexOf(target);
         if (targetIndex < 0) {
             throw new EmployeeNotFoundException();
         }
-        return target;
+        return employees.get(targetIndex);
     }
 
-    private int findEmployee(Employee target) {
-        int targetIndex = -1;
-        int lastElementIndex = Math.min(addedEmloyees, employees.length - 1);
-        for (int i = 0; i < lastElementIndex; i++) {
-            if (employees[i] != null && employees[i].equals(target)) {
-                targetIndex = i;
-            }
-        }
-        return targetIndex;
-    }
+
 
 
 }
