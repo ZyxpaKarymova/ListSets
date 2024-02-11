@@ -7,14 +7,15 @@ import pro.sky.ListsSets.exceptions.EmployeeNotFoundException;
 import pro.sky.ListsSets.exceptions.EmployeeStorageFullException;
 import pro.sky.ListsSets.model.Employee;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 
 @Service
 public class EmployeeService {
     private static final int AMOUNT = 5;
-    private final List<Employee> employees = new ArrayList();
+    private final Map<String, Employee> employees = new HashMap<>();
 
 
 
@@ -22,33 +23,42 @@ public class EmployeeService {
         if (employees.size() >= AMOUNT) {
             throw new EmployeeStorageFullException();
         }
-        Employee employee = new Employee(firstName, lastName);
-        if (employees.contains(employee)) {
+        String key = getKey(firstName, lastName);
+        if (employees.containsKey(key)) {
             throw new EmployeeAlreadyAddedException();
         }
-        employees.add(employee);
+        Employee employee = new Employee(firstName, lastName);
+        employees.put(key, employee);
         return employee;
     }
 
     public Employee removeEmployee(String firstName, String lastName) {
-        Employee target = new Employee(firstName, lastName);
-        if (!employees.remove(target)) {
+
+        Employee employee = employees.remove(getKey(firstName, lastName));
+        if (employee == null) {
             throw new EmployeeNotFoundException();
         }
 
-        return target;
+        return employee;
     }
 
     public Employee findEmployee(String firstName, String lastName) {
-        Employee target = new Employee(firstName, lastName);
-        int targetIndex = employees.indexOf(target);
-        if (targetIndex < 0) {
+        String key = getKey(firstName, lastName);
+        Employee employee = employees.get(key);
+        if (employee == null) {
             throw new EmployeeNotFoundException();
         }
-        return employees.get(targetIndex);
+
+        return employee;
     }
 
 
+    public Collection<Employee>getEmployees(){
+        return employees.values();
+    }
+    private String getKey(String firstName, String lastName) {
+        return firstName + lastName;
+    }
 
 
 }
