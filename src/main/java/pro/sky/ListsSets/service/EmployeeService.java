@@ -7,67 +7,57 @@ import pro.sky.ListsSets.exceptions.EmployeeNotFoundException;
 import pro.sky.ListsSets.exceptions.EmployeeStorageFullException;
 import pro.sky.ListsSets.model.Employee;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
 
 @Service
 public class EmployeeService {
     private static final int AMOUNT = 5;
-    private final Employee[] employees = new Employee[AMOUNT];
-    private int addedEmloyees = 0;
+    private final Map<String, Employee> employees = new HashMap<>();
+
 
 
     public Employee addEmployee(@RequestParam() String firstName, @RequestParam() String lastName) {
-        if (addedEmloyees >= AMOUNT) {throw new EmployeeStorageFullException();}
-        Employee employee = new Employee(firstName, lastName);
-        if (findEmployee(employee) >= 0) {
+        if (employees.size() >= AMOUNT) {
+            throw new EmployeeStorageFullException();
+        }
+        String key = getKey(firstName, lastName);
+        if (employees.containsKey(key)) {
             throw new EmployeeAlreadyAddedException();
         }
-        employees[addedEmloyees] = employee;
-        addedEmloyees++;
+        Employee employee = new Employee(firstName, lastName);
+        employees.put(key, employee);
+        return employee;
+    }
+
+    public Employee removeEmployee(String firstName, String lastName) {
+
+        Employee employee = employees.remove(getKey(firstName, lastName));
+        if (employee == null) {
+            throw new EmployeeNotFoundException();
+        }
+
+        return employee;
+    }
+
+    public Employee findEmployee(String firstName, String lastName) {
+        String key = getKey(firstName, lastName);
+        Employee employee = employees.get(key);
+        if (employee == null) {
+            throw new EmployeeNotFoundException();
+        }
+
         return employee;
     }
 
 
-    public Employee removeEmployee(String firstName, String lastName) {
-        Employee target = new Employee(firstName, lastName);
-        int targetIndex = findEmployee(target);
-        if (targetIndex < 0) {
-            throw new EmployeeNotFoundException();
-        }
-        /*for (int i = 0; i < addedEmloyees; i++) {
-            if (employees[i] != null && (employees[i].equals(target))) {
-                targetIndex = i;
-                break;
-            }
-        }*/
-        if (targetIndex < 0) {
-            throw new EmployeeNotFoundException();
-        }
-        employees[targetIndex] = null;
-        if (targetIndex != employees.length - 1)
-            System.arraycopy(employees, targetIndex + 1, employees, targetIndex, employees.length - targetIndex - 1);
-        addedEmloyees--;
-        return target;
+    public Collection<Employee>getEmployees(){
+        return employees.values();
     }
-
-
-    public Employee findEmployee(String firstName, String lastName) {
-        Employee target = new Employee(firstName, lastName);
-        int targetIndex = findEmployee(target);
-        if (targetIndex < 0) {
-            throw new EmployeeNotFoundException();
-        }
-        return target;
-    }
-
-    private int findEmployee(Employee target) {
-        int targetIndex = -1;
-        int lastElementIndex = Math.min(addedEmloyees, employees.length - 1);
-        for (int i = 0; i < lastElementIndex; i++) {
-            if (employees[i] != null && employees[i].equals(target)) {
-                targetIndex = i;
-            }
-        }
-        return targetIndex;
+    private String getKey(String firstName, String lastName) {
+        return firstName + lastName;
     }
 
 
