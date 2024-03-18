@@ -6,18 +6,15 @@ public class Employee {
     private String firstName;
 
     private String lastName;
+    private int salary;
 
-    public Employee(String firstName, String lastName) {
+    private int department;
+
+    public Employee(String firstName, String lastName, int salary, int department) {
         this.firstName = firstName;
         this.lastName = lastName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+        this.salary = salary;
+        this.department = department;
     }
 
     public String getFirstName() {
@@ -28,7 +25,29 @@ public class Employee {
         return lastName;
     }
 
+    public int getSalary() {
+        return salary;
+    }
 
+    public int getDepartment() {
+        return department;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public void setSalary(int salary) {
+        this.salary = salary;
+    }
+
+    public void setDepartment(int department) {
+        this.department = department;
+    }
 
     public int hashCode() {
         return Objects.hash(firstName,lastName);
